@@ -39,13 +39,13 @@ const Order = mongoose.model('Order', OrderSchema);
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 
-// Admin Authentication Middleware (Updated with your email and password)
+// Admin Authentication Middleware (Updated with your correct email and password)
 const authAdmin = (req, res, next) => {
     const { email, password } = req.query;
-    if (email === 'nuragchauhan78760@gmail.com' && password === '__anurag__chauhan__') {
+    if (email === 'anuragchauhan78760@gmail.com' && password === '__anurag__chauhan__') {
         next();
     } else {
-        res.status(401).send('Unauthorized. Use email: nuragchauhan78760@gmail.com and password: __anurag__chauhan__');
+        res.status(401).send('Unauthorized. Use email: anuragchauhan78760@gmail.com and password: __anurag__chauhan__');
     }
 };
 
