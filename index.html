@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Amarkart - India's premier online shopping platform for Electronics, Fashion, Handmade Goods, and Digital Products.">
+    <title>Amarkart - Shop the Best Online Deals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background: #f1f3f6;
+            color: #232f3e;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #232f3e;
+            color: #fff;
+            padding: 12px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .search-bar {
+            flex: 1;
+            margin: 0 20px;
+            position: relative;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+            outline: none;
+        }
+        .search-bar button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            background: #febd69;
+            color: #232f3e;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .search-bar button:hover {
+            background: #f7a21a;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links li {
+            margin: 0 15px;
+        }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #febd69;
+        }
+        .section {
+            display: none;
+            padding: 20px 30px;
+            animation: fadeIn 0.3s ease;
+        }
+        .section.active {
+            display: block;
+        }
+        .hero {
+            background: linear-gradient(135deg, #232f3e, #2874f0);
+            color: #fff;
+            text-align: center;
+            padding: 60px 30px;
+            margin-bottom: 20px;
+            border-radius: 0 0 10px 10px;
+        }
+        .hero h1 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .cta-btn {
+            background: #febd69;
+            color: #232f3e;
+            padding: 12px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .cta-btn:hover {
+            background: #f7a21a;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .filters select, .filters input {
+            padding: 10px;
+            border: 1px solid #d5d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 180px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .product img {
+            max-width: 100%;
+            border-radius: 4px;
+        }
+        .product h3 {
+            font-size: 16px;
+            margin: 10px 0;
+            color: #0f1111;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .product .price {
+            font-size: 18px;
+            color: #b12704;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+        .product .rating {
+            color: #ffca28;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        .add-to-cart {
+            background: #ffd814;
+            color: #0f1111;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .add-to-cart:hover {
+            background: #f7ca00;
+        }
+        .product-details {
+            display: flex;
+            gap: 30px;
+            padding: 30px;
+            background: #fff;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .product-details img {
+            max-width: 400px;
+            border-radius: 8px;
+        }
+        .product-details .info {
+            flex: 1;
+        }
+        .cart-items, .checkout-form {
+            background: #fff;
+            padding: 25px;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .cart-items ul {
+            list-style: none;
+        }
+        .cart-items li {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e7e7e7;
+        }
+        .checkout-form form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .checkout-form input, .checkout-form select {
+            padding: 12px;
+            border: 1px solid #d5d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .checkout-form button {
+            background: #ffd814;
+            color: #0f1111;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .checkout-form button:hover {
+            background: #f7ca00;
+        }
+        footer {
+            background: #232f3e;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; padding: 10px; }
+            .search-bar { margin: 10px 0; width: 100%; }
+            .hero h1 { font-size: 28px; }
+            .hero p { font-size: 16px; }
+            .product-details { flex-direction: column; }
+            .product-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Amarkart</div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search for products, brands, and more..." id="search-input">
+                <button onclick="searchProducts()">Search</button>
+            </div>
+            <ul class="nav-links">
+                <li><a onclick="showSection('home')">Home</a></li>
+                <li><a onclick="showSection('shop')">Shop</a></li>
+                <li><a onclick="showSection('cart')">Cart</a></li>
+                <li><a onclick="showSection('checkout')">Checkout</a></li>
+                <li><a href="mailto:support@amarkart.com">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="section active">
+        <div class="hero">
+            <h1>Discover Unbeatable Deals at Amarkart</h1>
+            <p>Shop the widest range of Electronics, Fashion, Handmade, and Digital Products</p>
+            <a href="#shop" class="cta-btn">Start Shopping</a>
+        </div>
+        <h2>Top Deals of the Day</h2>
+        <div class="product-grid" id="bestsellers"></div>
+    </section>
+
+    <section id="shop" class="section">
+        <h1>Explore Our Products</h1>
+        <div class="filters">
+            <select id="sort" onchange="sortProducts()">
+                <option value="default">Sort by</option>
+                <option value="high-to-low">Price: High to Low</option>
+                <option value="low-to-high">Price: Low to High</option>
+            </select>
+            <input type="number" placeholder="Minimum Price" id="min-price" oninput="filterProducts()">
+            <input type="number" placeholder="Maximum Price" id="max-price" oninput="filterProducts()">
+            <select id="category" onchange="filterProducts()">
+                <option value="all">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Clothes">Fashion</option>
+                <option value="Handmade">Handmade</option>
+                <option value="Digital">Digital</option>
+            </select>
+        </div>
+        <div class="product-grid" id="shop-products"></div>
+    </section>
+
+    <section id="product" class="section">
+        <div class="product-details">
+            <img id="product-img" src="" alt="Product Image">
+            <div class="info">
+                <h1 id="product-name"></h1>
+                <p class="price" id="product-price"></p>
+                <div class="rating">★★★★☆ (4.5) | 1,234 Reviews</div>
+                <p id="product-desc"></p>
+                <p><strong>Availability:</strong> <span id="product-stock">In Stock</span></p>
+                <button class="add-to-cart" id="product-add-btn">Add to Cart</button>
+                <p><strong>Payment Options:</strong> UPI | Cash on Delivery | Credit/Debit Card</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="cart" class="section">
+        <h1>Your Shopping Cart</h1>
+        <div class="cart-items">
+            <ul id="cart-items"></ul>
+            <p><strong>Total:</strong> ₹<span id="cart-total">0</span></p>
+            <div class="cta-btn" onclick="showSection('checkout')">Proceed to Checkout</div>
+        </div>
+    </section>
+
+    <section id="checkout" class="section">
+        <h1>Checkout</h1>
+        <div class="checkout-form">
+            <form id="checkout-form" onsubmit="placeOrder(event)">
+                <input type="text" placeholder="Full Name" required>
+                <input type="text" placeholder="Shipping Address" required>
+                <input type="text" placeholder="Phone Number" required>
+                <input type="email" placeholder="Email Address" required>
+                <select id="payment-method" required>
+                    <option value="upi">UPI</option>
+                    <option value="cod">Cash on Delivery</option>
+                    <option value="card">Credit/Debit Card</option>
+                </select>
+                <button type="submit" class="cta-btn">Place Your Order</button>
+            </form>
+            <p id="order-confirmation" style="display:none; color:green; margin-top:15px;"></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 Amarkart. All Rights Reserved. | <a href="#terms" style="color:#febd69;">Terms & Conditions</a> | <a href="#privacy" style="color:#febd69;">Privacy Policy</a> | <a href="mailto:support@amarkart.com" style="color:#febd69;">Customer Support</a></p>
+    </footer>
+
+    <script>
+        const products = [
+            { name: 'Wireless Noise-Canceling Earbuds', price: 5499, desc: 'Premium earbuds with advanced noise cancellation and 24-hour battery life.', img: 'https://via.placeholder.com/400', category: 'Electronics', stock: 50 },
+            { name: 'Men’s Designer Kurta Set', price: 2499, desc: 'Handcrafted kurta set with traditional embroidery.', img: 'https://via.placeholder.com/400', category: 'Clothes', stock: 30 },
+            { name: 'Handmade Ceramic Vase', price: 1899, desc: 'Elegant artisan-crafted vase for home decor.', img: 'https://via.placeholder.com/400', category: 'Handmade', stock: 20 },
+            { name: 'Advanced Digital Marketing Course', price: 3499, desc: 'Online course with lifetime access and certification.', img: 'https://via.placeholder.com/400', category: 'Digital', stock: 100 }
+        ];
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let total = parseFloat(localStorage.getItem('cartTotal')) || 0;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            if (sectionId === 'home') renderProducts('bestsellers', products.slice(0, 2));
+            if (sectionId === 'shop') sortProducts();
+            if (sectionId === 'cart') updateCart();
+        }
+
+        function renderProducts(containerId, productList) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            productList.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'product';
+                div.innerHTML = `<img src="${p.img}" alt="${p.name}"><h3>${p.name}</h3><p class="price">₹${p.price.toLocaleString()}</p><div class="rating">★★★★☆ (4.5)</div><button class="add-to-cart" onclick="addToCart('${p.name}', ${p.price}, ${p.stock})">Add to Cart</button>`;
+                div.onclick = () => showProduct(p.name, p.price, p.desc, p.img, p.stock);
+                container.appendChild(div);
+            });
+        }
+
+        function showProduct(name, price, desc, img, stock) {
+            document.getElementById('product-name').textContent = name;
+            document.getElementById('product-price').textContent = `₹${price.toLocaleString()}`;
+            document.getElementById('product-desc').textContent = desc;
+            document.getElementById('product-img').src = img;
+            document.getElementById('product-stock').textContent = stock > 0 ? 'In Stock' : 'Out of Stock';
+            document.getElementById('product-add-btn').onclick = () => addToCart(name, price, stock);
+            showSection('product');
+        }
+
+        function addToCart(name, price, stock) {
+            if (stock <= 0) {
+                alert('This product is out of stock!');
+                return;
+            }
+            cart.push({ name, price, quantity: 1 });
+            total += price;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            localStorage.setItem('cartTotal', total);
+            alert(`${name} added to cart!`);
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';
+            cart.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.name} x${item.quantity} - ₹${(item.price * item.quantity).toLocaleString()}`;
+                cartItems.appendChild(li);
+            });
+            document.getElementById('cart-total').textContent = total.toLocaleString();
+        }
+
+        function sortProducts() {
+            const sortValue = document.getElementById('sort').value;
+            let sorted = [...products];
+            if (sortValue === 'high-to-low') sorted.sort((a, b) => b.price - a.price);
+            else if (sortValue === 'low-to-high') sorted.sort((a, b) => a.price - b.price);
+            filterProducts(sorted);
+        }
+
+        function filterProducts(sortedProducts = products) {
+            const min = parseInt(document.getElementById('min-price').value) || 0;
+            const max = parseInt(document.getElementById('max-price').value) || Infinity;
+            const category = document.getElementById('category').value;
+            let filtered = sortedProducts.filter(p => p.price >= min && p.price <= max);
+            if (category !== 'all') filtered = filtered.filter(p => p.category === category);
+            renderProducts('shop-products', filtered);
+        }
+
+        function searchProducts() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query));
+            renderProducts('shop-products', filtered);
+            showSection('shop');
+        }
+
+        function placeOrder(event) {
+            event.preventDefault();
+            const method = document.getElementById('payment-method').value;
+            const confirmation = document.getElementById('order-confirmation');
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            confirmation.style.display = 'block';
+            confirmation.textContent = method === 'upi' ? 'Redirecting to UPI Payment. Order #ORD' + Math.floor(Math.random() * 1000000) + ' placed successfully!' : 'Order #ORD' + Math.floor(Math.random() * 1000000) + ' placed with Cash on Delivery!';
+            cart = [];
+            total = 0;
+            localStorage.removeItem('cart');
+            localStorage.removeItem('cartTotal');
+            updateCart();
+            setTimeout(() => showSection('home'), 3000);
+        }
+
+        // Initial render and cart update
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('home');
+            updateCart();
+        });
+    </script>
+</body>
+</html>
