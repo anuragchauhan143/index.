@@ -117,7 +117,6 @@
     <section id="admin-login" class="section" style="display:none;">
         <div class="admin-login-section">
             <h2>Admin Login</h2>
-            <input type="email" id="admin-email" placeholder="Admin Email" required aria-label="Admin email">
             <input type="password" id="admin-password" placeholder="Admin Password" required aria-label="Admin password">
             <button onclick="loginAdmin()">Login</button>
             <p id="admin-login-message" style="color:red;"></p>
@@ -148,6 +147,12 @@
                 <input type="text" id="admin-search" placeholder="Search products..." oninput="searchAdminProducts()" aria-label="Search admin products">
             </div>
             <ul id="admin-product-list"></ul>
+            <h2>Change Admin Password</h2>
+            <div class="password-change">
+                <input type="password" id="new-admin-password" placeholder="New Admin Password" required aria-label="New admin password">
+                <button onclick="changeAdminPassword()" class="cta-btn">Change Password</button>
+            </div>
+            <p id="password-change-message" style="color:green;"></p>
         </div>
     </section>
 
