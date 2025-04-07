@@ -1,12 +1,10 @@
-// admin.js
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3001;
 
-mongoose.connect('mongodb+srv://anuragchauhan78760:__anurag__chauhan__@anurakart.z4ltcpf.mongodb.net/anurakart?retryWrites=true&w=majority&appName=anurakart
-', {
+mongoose.connect('mongodb+srv://anuragchauhan78760:__anurag__chauhan__@anurakart.z4ltcpf.mongodb.net/anurakart?retryWrites=true&w=majority&appName=anurakart', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => console.log('MongoDB connected')).catch(err => console.log(err));
@@ -51,7 +49,7 @@ const authAdmin = (req, res, next) => {
 };
 
 app.get('/admin', authAdmin, (req, res) => {
-  res.render('admin', { products: [], orders: [], users: [] });
+  res.render('admin');
 });
 
 app.get('/api/admin/products', authAdmin, async (req, res) => {
