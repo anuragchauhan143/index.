@@ -3,27 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Amarkart - The Ultimate Shopping Experience">
-    <meta name="keywords" content="ecommerce, shopping, amazon, flipkart, online store">
-    <title>Amarkart - Everything You Need</title>
+    <meta name="description" content="Amarkart - Ultimate Shopping Experience">
+    <title>Amarkart - Shop Everything</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2874f0">
 </head>
 <body>
     <header>
         <h1>Amarkart</h1>
         <div class="search-bar">
-            <input type="text" id="search" placeholder="Search products, brands, and more..." oninput="searchProducts()" aria-label="Search products">
+            <input type="text" id="search" placeholder="Search products, brands, or categories..." oninput="searchProducts()" autocomplete="off" aria-label="Search products">
             <div id="search-suggestions" class="suggestions"></div>
             <button onclick="searchProducts()" aria-label="Search">🔍</button>
-            <button onclick="voiceSearch()" aria-label="Voice Search">🎤</button>
         </div>
         <nav>
-            <select id="currency" onchange="changeCurrency()">
-                <option value="INR">₹ INR</option>
-                <option value="USD">$ USD</option>
-            </select>
             <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
             <a href="#" onclick="showSection('shop')">Shop</a>
             <a href="#" onclick="showSection('wishlist')">Wishlist (<span id="wishlist-count">0</span>)</a>
@@ -41,7 +33,6 @@
                 <option value="high-to-low">Price: High to Low</option>
                 <option value="low-to-high">Price: Low to High</option>
                 <option value="rating">Customer Rating</option>
-                <option value="newest">Newest First</option>
             </select>
             <input type="number" id="min-price" placeholder="Min Price" oninput="filterProducts()" aria-label="Minimum price">
             <input type="number" id="max-price" placeholder="Max Price" oninput="filterProducts()" aria-label="Maximum price">
@@ -52,15 +43,8 @@
                 <option value="Home">Home & Kitchen</option>
                 <option value="Books">Books</option>
             </select>
-            <label><input type="checkbox" id="in-stock" onchange="filterProducts()"> In Stock Only</label>
-            <input type="text" id="coupon" placeholder="Enter Coupon Code" oninput="applyCoupon()">
         </div>
         <div class="product-grid" id="shop-products"></div>
-        <button id="load-more" onclick="loadMoreProducts()">Load More</button>
-        <div id="recommendations" class="recommendations">
-            <h3>Recommended for You</h3>
-            <div id="recommended-products" class="product-grid"></div>
-        </div>
     </section>
 
     <section id="product" class="section">
@@ -72,24 +56,9 @@
                 <div class="rating" id="product-rating"></div>
                 <p id="product-desc"></p>
                 <p><strong>Availability:</strong> <span id="product-stock"></span></p>
-                <p><strong>Delivery:</strong> <span id="product-delivery"></span></p>
-                <p><strong>Price History:</strong> <span id="product-price-history"></span></p>
                 <input type="number" id="product-quantity" min="1" value="1" aria-label="Quantity">
                 <button class="add-to-cart" id="product-add-btn">Add to Cart</button>
                 <button class="wishlist-btn" id="product-wishlist-btn">Add to Wishlist</button>
-                <div class="reviews">
-                    <h3>Customer Reviews</h3>
-                    <ul id="product-reviews"></ul>
-                    <textarea id="review-text" placeholder="Write your review" aria-label="Review text"></textarea>
-                    <select id="review-rating" aria-label="Review rating">
-                        <option value="5">5 Stars</option>
-                        <option value="4">4 Stars</option>
-                        <option value="3">3 Stars</option>
-                        <option value="2">2 Stars</option>
-                        <option value="1">1 Star</option>
-                    </select>
-                    <button onclick="addReview()">Submit Review</button>
-                </div>
             </div>
         </div>
     </section>
@@ -98,7 +67,7 @@
         <h1>Your Shopping Cart</h1>
         <div class="cart-items">
             <ul id="cart-items"></ul>
-            <p><strong>Total:</strong> <span id="cart-total-currency"></span><span id="cart-total">0</span></p>
+            <p><strong>Total:</strong> ₹<span id="cart-total">0</span></p>
             <button class="cta-btn" onclick="showSection('checkout')">Proceed to Checkout</button>
         </div>
     </section>
@@ -117,19 +86,9 @@
                 <input type="tel" id="phone" placeholder="Phone Number" required aria-label="Phone number">
                 <input type="email" id="email" placeholder="Email Address" required aria-label="Email address">
                 <select id="payment-method" required aria-label="Payment method">
-                    <option value="">Select Payment Method</option>
                     <option value="upi">UPI</option>
-                    <option value="card">Credit/Debit Card</option>
                     <option value="cod">Cash on Delivery</option>
                 </select>
-                <div id="payment-details" style="display:none;">
-                    <input type="text" id="upi-id" placeholder="UPI ID (e.g., user@upi)" aria-label="UPI ID">
-                    <input type="password" id="upi-pin" placeholder="UPI PIN" aria-label="UPI PIN">
-                    <input type="text" id="card-number" placeholder="Card Number" aria-label="Card number">
-                    <input type="text" id="card-expiry" placeholder="MM/YY" aria-label="Card expiry">
-                    <input type="text" id="card-cvv" placeholder="CVV" aria-label="CVV">
-                    <input type="text" id="card-otp" placeholder="OTP (Simulated)" aria-label="Card OTP">
-                </div>
                 <button type="submit" class="cta-btn">Place Order</button>
             </form>
             <p id="order-confirmation" style="display:none; color:green;"></p>
@@ -139,7 +98,7 @@
     <section id="profile" class="section">
         <h1>Your Profile</h1>
         <div id="profile-info"></div>
-        <h3>Your Orders</h3>
+        <h3>Your Orders</h1>
         <ul id="order-history"></ul>
         <button onclick="logout()">Logout</button>
     </section>
@@ -160,7 +119,7 @@
             <h1>Admin Panel</h1>
             <div class="product-form">
                 <input type="text" id="admin-product-name" placeholder="Product Name" required>
-                <input type="number" id="admin-product-price" placeholder="Price" required>
+                <input type="number" id="admin-product-price" placeholder="Price (₹)" required>
                 <input type="text" id="admin-product-desc" placeholder="Description" required>
                 <input type="text" id="admin-product-img" placeholder="Image URL">
                 <select id="admin-product-category" required>
@@ -174,25 +133,11 @@
             </div>
             <h3>Manage Products</h3>
             <ul id="admin-product-list"></ul>
-            <h3>Manage Orders</h3>
-            <ul id="admin-order-list"></ul>
-            <h3>Manage Users</h3>
-            <ul id="admin-user-list"></ul>
-            <h3>Analytics</h3>
-            <div id="admin-analytics"></div>
         </div>
     </section>
 
-    <div id="chat" class="chat-box" style="display:none;">
-        <h3>Live Chat Support</h3>
-        <div id="chat-messages"></div>
-        <input type="text" id="chat-input" placeholder="Type your message">
-        <button onclick="sendChat()">Send</button>
-    </div>
-    <button id="chat-toggle" onclick="toggleChat()">💬</button>
-
     <footer>
-        <p>© 2025 Amarkart. All Rights Reserved. | <a href="#terms">Terms</a> | <a href="#privacy">Privacy</a> | <a href="mailto:support@amarkart.com">Support</a></p>
+        <p>© 2025 Amarkart. All Rights Reserved.</p>
     </footer>
 
     <script src="script.js"></script>
