@@ -1,38 +1,59 @@
-// Data
-let products = [
-    { id: 1, name: "Laptop", price: 50000, category: "Electronics", desc: "High-performance laptop", img: "https://via.placeholder.com/150", stock: 10, rating: 4.5, reviews: ["Great product!"] },
-    { id: 2, name: "T-Shirt", price: 999, category: "Clothes", desc: "Cotton T-Shirt", img: "https://via.placeholder.com/150", stock: 50, rating: 4.0, reviews: ["Nice fit."] }
+// Data with persistence
+const defaultProducts = [
+    { id: 1, name: "Laptop", price: 50000, category: "Electronics", desc: "High-performance laptop", img: "https://via.placeholder.com/150", stock: 10, rating: 4.5, reviews: [{ user: "user1", text: "Great!", rating: 5 }], createdAt: Date.now() },
+    { id: 2, name: "T-Shirt", price: 999, category: "Fashion", desc: "Cotton T-Shirt", img: "https://via.placeholder.com/150", stock: 50, rating: 4.0, reviews: [{ user: "user2", text: "Nice fit", rating: 4 }], createdAt: Date.now() }
 ];
-let cart = [];
-let wishlist = [];
-let orders = [];
-let users = [];
-let loggedInUser = null;
+let products = JSON.parse(localStorage.getItem("products")) || defaultProducts;
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let loggedInUser = localStorage.getItem("loggedInUser") || null;
 
 // Utility: Show section
 function showSection(sectionId) {
+    if (!loggedInUser && sectionId !== "login") return showSection("login");
     document.querySelectorAll(".section").forEach(section => {
         section.classList.toggle("active", section.id === sectionId);
     });
-    if (!loggedInUser && sectionId !== "login") showSection("login");
+    saveData();
 }
 
-// Display products
+// Persistence
+function saveData() {
+    localStorage.setItem("products", JSON.stringify(products));
+    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    localStorage.setItem("orders", JSON.stringify(orders));
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("loggedInUser", loggedInUser);
+}
+
+// Theme toggle
+function toggleTheme() {
+    document.body.classList.toggle("dark");
+    document.getElementById("theme-toggle").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
+}
+
+// Display products with virtual scrolling
 function displayProducts(filteredProducts = products) {
     const productGrid = document.getElementById("shop-products");
     productGrid.innerHTML = "";
-    filteredProducts.forEach(product => {
-        const div = document.createElement("div");
-        div.className = "product-card";
-        div.innerHTML = `
-            <img src="${product.img}" alt="${product.name}">
-            <h3>${product.name}</h3>
-            <p>₹${product.price.toLocaleString()}</p>
-            <div class="rating">${"★".repeat(Math.floor(product.rating)) + "☆".repeat(5 - Math.floor(product.rating))} (${product.rating})</div>
-            <button onclick="showProduct(${product.id})">View</button>
-        `;
-        productGrid.appendChild(div);
-    });
+    filteredProducts.slice(0, 20).forEach(product => renderProduct(product, productGrid)); // Limit to 20 for performance
+    displayRecommendations();
+}
+
+function renderProduct(product, container) {
+    const div = document.createElement("div");
+    div.className = "product-card";
+    div.innerHTML = `
+        <img src="${product.img}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <p>₹${product.price.toLocaleString()}</p>
+        <div class="rating">${"★".repeat(Math.floor(product.rating)) + "☆".repeat(5 - Math.floor(product.rating))} (${product.rating})</div>
+        <button onclick="showProduct(${product.id})">View Details</button>
+    `;
+    container.appendChild(div);
 }
 
 // Show product details
@@ -47,24 +68,21 @@ function showProduct(productId) {
     document.getElementById("product-stock").innerText = product.stock > 0 ? `In Stock (${product.stock})` : "Out of Stock";
     document.getElementById("product-add-btn").onclick = () => addToCart(product);
     document.getElementById("product-wishlist-btn").onclick = () => addToWishlist(product);
+    document.getElementById("product-quantity").value = 1;
     const reviewsList = document.getElementById("product-reviews");
-    reviewsList.innerHTML = "";
-    product.reviews.forEach(review => {
-        const li = document.createElement("li");
-        li.innerText = review;
-        reviewsList.appendChild(li);
-    });
+    reviewsList.innerHTML = product.reviews.map(r => `<li>${r.user}: ${r.text} (${"★".repeat(r.rating)})</li>`).join("");
     showSection("product");
 }
 
-// Cart/Wishlist management
+// Cart/Wishlist
 function addToCart(product) {
-    if (product.stock <= 0) return alert("Out of stock!");
-    cart.push({ ...product, cartId: Date.now() + Math.random() });
-    product.stock--;
+    const quantity = parseInt(document.getElementById("product-quantity").value);
+    if (product.stock < quantity) return alert(`Only ${product.stock} items in stock!`);
+    cart.push({ ...product, cartId: Date.now() + Math.random(), quantity });
+    product.stock -= quantity;
     updateCart();
     updateAdminProductList();
-    alert(`${product.name} added to cart!`);
+    alert(`${product.name} (${quantity}) added to cart!`);
 }
 
 function addToWishlist(product) {
@@ -81,10 +99,11 @@ function updateCart() {
     cartItems.innerHTML = "";
     cart.forEach(item => {
         const li = document.createElement("li");
-        li.innerHTML = `${item.name} - ₹${item.price.toLocaleString()} <button onclick="removeFromCart(${item.cartId})">Remove</button>`;
+        li.innerHTML = `${item.name} - ₹${(item.price * item.quantity).toLocaleString()} (${item.quantity}) 
+            <button onclick="removeFromCart(${item.cartId})">Remove</button>`;
         cartItems.appendChild(li);
     });
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     cartTotal.innerText = total.toLocaleString();
     cartCount.innerText = cart.length;
 }
@@ -93,7 +112,7 @@ function removeFromCart(cartId) {
     const item = cart.find(i => i.cartId === cartId);
     cart = cart.filter(i => i.cartId !== cartId);
     const product = products.find(p => p.id === item.id);
-    product.stock++;
+    product.stock += item.quantity;
     updateCart();
     updateAdminProductList();
 }
@@ -104,7 +123,9 @@ function updateWishlist() {
     wishlistItems.innerHTML = "";
     wishlist.forEach(item => {
         const li = document.createElement("li");
-        li.innerHTML = `${item.name} - ₹${item.price.toLocaleString()} <button onclick="removeFromWishlist(${item.id})">Remove</button>`;
+        li.innerHTML = `${item.name} - ₹${item.price.toLocaleString()} 
+            <button onclick="removeFromWishlist(${item.id})">Remove</button>
+            <button onclick="addToCartFromWishlist(${item.id})">Add to Cart</button>`;
         wishlistItems.appendChild(li);
     });
     wishlistCount.innerText = wishlist.length;
@@ -115,10 +136,19 @@ function removeFromWishlist(productId) {
     updateWishlist();
 }
 
+function addToCartFromWishlist(productId) {
+    const product = wishlist.find(w => w.id === productId);
+    addToCart(product);
+    removeFromWishlist(productId);
+}
+
 // Search, Sort, Filter
 function searchProducts() {
     const query = document.getElementById("search").value.toLowerCase();
+    const suggestions = document.getElementById("search-suggestions");
     const filtered = products.filter(p => p.name.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query));
+    suggestions.innerHTML = filtered.slice(0, 5).map(p => `<div onclick="showProduct(${p.id})">${p.name}</div>`).join("");
+    suggestions.style.display = query ? "block" : "none";
     displayProducts(filtered);
 }
 
@@ -128,6 +158,7 @@ function sortProducts() {
     if (sortValue === "high-to-low") sorted.sort((a, b) => b.price - a.price);
     else if (sortValue === "low-to-high") sorted.sort((a, b) => a.price - b.price);
     else if (sortValue === "rating") sorted.sort((a, b) => b.rating - a.rating);
+    else if (sortValue === "newest") sorted.sort((a, b) => b.createdAt - a.createdAt);
     displayProducts(sorted);
 }
 
@@ -135,11 +166,21 @@ function filterProducts() {
     const minPrice = parseFloat(document.getElementById("min-price").value) || 0;
     const maxPrice = parseFloat(document.getElementById("max-price").value) || Infinity;
     const category = document.getElementById("category").value;
+    const inStock = document.getElementById("in-stock").checked;
     const filtered = products.filter(p => 
         p.price >= minPrice && p.price <= maxPrice && 
-        (category === "all" || p.category === category)
+        (category === "all" || p.category === category) &&
+        (!inStock || p.stock > 0)
     );
     displayProducts(filtered);
+}
+
+// Recommendations
+function displayRecommendations() {
+    const recommended = products.filter(p => p.rating >= 4).slice(0, 4);
+    const recommendedGrid = document.getElementById("recommended-products");
+    recommendedGrid.innerHTML = "";
+    recommended.forEach(product => renderProduct(product, recommendedGrid));
 }
 
 // Checkout
@@ -147,44 +188,63 @@ function placeOrder(event) {
     event.preventDefault();
     if (!loggedInUser) return alert("Please login first!");
     if (cart.length === 0) return alert("Cart is empty!");
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const paymentMethod = document.getElementById("payment-method").value;
-    const order = { id: Date.now(), items: [...cart], total, status: "Processing", user: loggedInUser, paymentMethod };
+    const order = { 
+        id: Date.now(), 
+        items: [...cart], 
+        total, 
+        status: "Processing", 
+        user: loggedInUser, 
+        paymentMethod, 
+        details: {
+            name: document.getElementById("full-name").value,
+            address: document.getElementById("address").value,
+            phone: document.getElementById("phone").value,
+            email: document.getElementById("email").value
+        }
+    };
 
+    document.getElementById("payment-details").style.display = paymentMethod === "cod" ? "none" : "block";
     if (paymentMethod === "upi") {
-        const upiId = prompt("Enter UPI ID (e.g., user@upi):");
+        const upiId = document.getElementById("upi-id").value;
         if (!/^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/.test(upiId)) return alert("Invalid UPI ID!");
-        simulateUPIPayment(total, upiId, order);
+        simulatePayment(total, `UPI (${upiId})`, order);
+    } else if (paymentMethod === "card") {
+        const cardNumber = document.getElementById("card-number").value;
+        if (!/^\d{16}$/.test(cardNumber)) return alert("Invalid card number!");
+        simulatePayment(total, "Card", order);
     } else {
         orders.push(order);
-        document.getElementById("order-confirmation").innerText = `Order placed! Total: ₹${total.toLocaleString()} (${paymentMethod})`;
-        document.getElementById("order-confirmation").style.display = "block";
-        cart = [];
-        updateCart();
-        updateProfile();
-        updateAdminOrderList();
+        finishOrder(total, "COD", order);
     }
 }
 
-function simulateUPIPayment(amount, upiId, order) {
+function simulatePayment(amount, method, order) {
     setTimeout(() => {
         orders.push(order);
-        document.getElementById("order-confirmation").innerText = `Order placed! Paid ₹${amount.toLocaleString()} via UPI (${upiId})`;
-        document.getElementById("order-confirmation").style.display = "block";
-        cart = [];
-        updateCart();
-        updateProfile();
-        updateAdminOrderList();
+        finishOrder(amount, method, order);
     }, 1500);
+}
+
+function finishOrder(amount, method, order) {
+    document.getElementById("order-confirmation").innerText = `Order #${order.id} placed! Total: ₹${amount.toLocaleString()} (${method})`;
+    document.getElementById("order-confirmation").style.display = "block";
+    cart = [];
+    updateCart();
+    updateProfile();
+    updateAdminOrderList();
 }
 
 // Reviews
 function addReview() {
     const productName = document.getElementById("product-name").innerText;
     const product = products.find(p => p.name === productName);
-    const review = document.getElementById("review-text").value;
-    if (!review) return alert("Write a review first!");
-    product.reviews.push(review);
+    const text = document.getElementById("review-text").value;
+    const rating = parseInt(document.getElementById("review-rating").value);
+    if (!text || !loggedInUser) return alert("Login and write a review!");
+    product.reviews.push({ user: loggedInUser, text, rating });
+    product.rating = product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length;
     showProduct(product.id);
     document.getElementById("review-text").value = "";
 }
@@ -195,7 +255,7 @@ function createAccount() {
     const password = document.getElementById("login-password").value;
     if (!email || !password) return alert("Fill all fields!");
     if (users.some(u => u.email === email)) return alert("User already exists!");
-    users.push({ email, password });
+    users.push({ email, password, createdAt: Date.now() });
     loggedInUser = email;
     document.getElementById("login-message").innerText = `Account created for ${email}!`;
     updateProfile();
@@ -236,7 +296,8 @@ function updateProfile() {
 }
 
 function trackOrder(orderId) {
-    alert(`Tracking Order #${orderId}: ${orders.find(o => o.id === orderId).status}`);
+    const order = orders.find(o => o.id === orderId);
+    alert(`Order #${orderId}: ${order.status}\nAddress: ${order.details.address}`);
 }
 
 function returnOrder(orderId) {
@@ -262,7 +323,8 @@ function addProduct() {
         category: document.getElementById("admin-product-category").value,
         stock: parseInt(document.getElementById("admin-product-stock").value),
         rating: 0,
-        reviews: []
+        reviews: [],
+        createdAt: Date.now()
     };
     if (!newProduct.name || isNaN(newProduct.price) || newProduct.stock < 0) return alert("Invalid input!");
     products.push(newProduct);
@@ -291,7 +353,18 @@ function updateAdminOrderList() {
         li.innerHTML = `Order #${o.id} - ${o.user} - ₹${o.total.toLocaleString()} - ${o.status}
             <button onclick="updateOrderStatus(${o.id}, 'Shipped')">Ship</button>
             <button onclick="updateOrderStatus(${o.id}, 'Delivered')">Deliver</button>`;
-        adminOrderList.appendChild(li);
+        adminList.appendChild(li);
+    });
+}
+
+function updateAdminUserList() {
+    const adminUserList = document.getElementById("admin-user-list");
+    adminUserList.innerHTML = "";
+    users.forEach(u => {
+        const li = document.createElement("li");
+        li.innerHTML = `${u.email} - Joined: ${new Date(u.createdAt).toLocaleDateString()}
+            <button onclick="deleteUser('${u.email}')">Delete</button>`;
+        adminUserList.appendChild(li);
     });
 }
 
@@ -328,9 +401,28 @@ function updateOrderStatus(orderId, status) {
     updateProfile();
 }
 
+function deleteUser(email) {
+    if (confirm(`Delete user ${email}?`)) {
+        users = users.filter(u => u.email !== email);
+        if (loggedInUser === email) logout();
+        updateAdminUserList();
+    }
+}
+
 function checkAdminAccess() {
     document.getElementById("admin").style.display = loggedInUser === "admin@example.com" ? "block" : "none";
+    if (loggedInUser === "admin@example.com") updateAdminUserList();
 }
+
+// Payment method toggle
+document.getElementById("payment-method").addEventListener("change", (e) => {
+    const details = document.getElementById("payment-details");
+    details.style.display = e.target.value === "cod" ? "none" : "block";
+    document.getElementById("upi-id").style.display = e.target.value === "upi" ? "block" : "none";
+    document.getElementById("card-number").style.display = e.target.value === "card" ? "block" : "none";
+    document.getElementById("card-expiry").style.display = e.target.value === "card" ? "block" : "none";
+    document.getElementById("card-cvv").style.display = e.target.value === "card" ? "block" : "none";
+});
 
 // Initialize
 displayProducts();
@@ -339,4 +431,5 @@ updateWishlist();
 updateProfile();
 updateAdminProductList();
 updateAdminOrderList();
-showSection("shop");
+showSection(loggedInUser ? "shop" : "login");
+if (document.body.classList.contains("dark")) document.getElementById("theme-toggle").innerText = "☀️";
