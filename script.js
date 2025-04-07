@@ -30,16 +30,7 @@ let orders = JSON.parse(localStorage.getItem("orders")) || [];
 let users = JSON.parse(localStorage.getItem("users")) || [];
 let loggedInUser = localStorage.getItem("loggedInUser") || null;
 let adminLoggedIn = JSON.parse(localStorage.getItem("adminLoggedIn")) || false;
-
-// Default admin setup with your email and password
-const defaultAdmin = {
-    email: "anuragchauhan78760@gmail.com",
-    password: "__anurag__chauhan__"
-};
-if (!users.some(u => u.email === defaultAdmin.email)) {
-    users.push(defaultAdmin);
-    localStorage.setItem("users", JSON.stringify(users));
-}
+let adminPassword = localStorage.getItem("adminPassword") || "admin123"; // Default password
 
 // Utility
 function showSection(sectionId) {
@@ -59,6 +50,7 @@ function saveData() {
     localStorage.setItem("users", JSON.stringify(users));
     localStorage.setItem("loggedInUser", loggedInUser);
     localStorage.setItem("adminLoggedIn", JSON.stringify(adminLoggedIn));
+    localStorage.setItem("adminPassword", adminPassword);
 }
 
 function toggleTheme() {
@@ -262,17 +254,15 @@ function logout() {
 
 // Admin Panel Functions
 function loginAdmin() {
-    const email = document.getElementById("admin-email").value;
     const password = document.getElementById("admin-password").value;
-    if (email === "anuragchauhan78760@gmail.com" && password === users.find(u => u.email === email).password) {
+    if (password === adminPassword) {
         adminLoggedIn = true;
         document.getElementById("admin-login-message").innerText = "";
         showSection("admin");
         updateAdminProductList();
     } else {
-        document.getElementById("admin-login-message").innerText = "Incorrect email or password!";
+        document.getElementById("admin-login-message").innerText = "Incorrect password!";
     }
-    document.getElementById("admin-email").value = "";
     document.getElementById("admin-password").value = "";
 }
 
@@ -366,6 +356,16 @@ function deleteProduct(productId) {
     }
 }
 
+function changeAdminPassword() {
+    if (!adminLoggedIn) return alert("Please login as admin first!");
+    const newPassword = document.getElementById("new-admin-password").value.trim();
+    if (newPassword.length < 6) return alert("Password must be at least 6 characters long!");
+    adminPassword = newPassword;
+    document.getElementById("new-admin-password").value = "";
+    document.getElementById("password-change-message").innerText = "Admin password changed successfully!";
+    saveData();
+}
+
 // Initialize
 displayProducts();
 updateCart();
@@ -389,4 +389,4 @@ function updateProfile() {
         li.innerHTML = `Order #${order.id} - ₹${order.total.toLocaleString()} - ${order.status}`;
         orderHistory.appendChild(li);
     });
-}
+        }
