@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Amarkart - Your one-stop online shopping destination">
-    <title>Amarkart - Shop Like Amazon & Flipkart</title>
+    <meta name="description" content="Amarkart - Ultimate Online Shopping Platform">
+    <meta name="keywords" content="ecommerce, shopping, amazon, flipkart, online store">
+    <title>Amarkart - Shop Everything</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
         <h1>Amarkart</h1>
         <div class="search-bar">
-            <input type="text" id="search" placeholder="Search products..." oninput="searchProducts()">
+            <input type="text" id="search" placeholder="Search products, brands, and more..." oninput="searchProducts()" autocomplete="off">
+            <div id="search-suggestions" class="suggestions"></div>
             <button onclick="searchProducts()">🔍</button>
         </div>
         <nav>
@@ -20,6 +22,7 @@
             <a href="#" onclick="showSection('cart')">Cart (<span id="cart-count">0</span>)</a>
             <a href="#" onclick="showSection('profile')">Profile</a>
             <a href="#" onclick="showSection('admin')">Admin</a>
+            <button id="theme-toggle" onclick="toggleTheme()">🌙</button>
         </nav>
     </header>
 
@@ -30,36 +33,51 @@
                 <option value="default">Sort by</option>
                 <option value="high-to-low">Price: High to Low</option>
                 <option value="low-to-high">Price: Low to High</option>
-                <option value="rating">Rating</option>
+                <option value="rating">Customer Rating</option>
+                <option value="newest">Newest First</option>
             </select>
-            <input type="number" placeholder="Min Price" id="min-price" oninput="filterProducts()">
-            <input type="number" placeholder="Max Price" id="max-price" oninput="filterProducts()">
+            <input type="number" id="min-price" placeholder="Min Price" oninput="filterProducts()">
+            <input type="number" id="max-price" placeholder="Max Price" oninput="filterProducts()">
             <select id="category" onchange="filterProducts()">
                 <option value="all">All Categories</option>
                 <option value="Electronics">Electronics</option>
-                <option value="Clothes">Fashion</option>
-                <option value="Handmade">Handmade</option>
-                <option value="Digital">Digital</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Home">Home & Kitchen</option>
+                <option value="Books">Books</option>
             </select>
+            <input type="checkbox" id="in-stock" onchange="filterProducts()"> <label for="in-stock">In Stock Only</label>
         </div>
         <div class="product-grid" id="shop-products"></div>
+        <div id="recommendations" class="recommendations">
+            <h3>Recommended for You</h3>
+            <div id="recommended-products" class="product-grid"></div>
+        </div>
     </section>
 
     <section id="product" class="section">
         <div class="product-details">
-            <img id="product-img" src="" alt="Product Image">
+            <img id="product-img" src="" alt="Product Image" loading="lazy">
             <div class="info">
                 <h1 id="product-name"></h1>
                 <p class="price" id="product-price"></p>
-                <div class="rating" id="product-rating">★★★★☆</div>
+                <div class="rating" id="product-rating"></div>
                 <p id="product-desc"></p>
                 <p><strong>Availability:</strong> <span id="product-stock"></span></p>
+                <p><strong>Delivery:</strong> <span id="product-delivery">Free Delivery by Apr 10, 2025</span></p>
+                <input type="number" id="product-quantity" min="1" value="1">
                 <button class="add-to-cart" id="product-add-btn">Add to Cart</button>
                 <button class="wishlist-btn" id="product-wishlist-btn">Add to Wishlist</button>
                 <div class="reviews">
-                    <h3>Reviews</h3>
+                    <h3>Customer Reviews</h3>
                     <ul id="product-reviews"></ul>
-                    <textarea id="review-text" placeholder="Write a review"></textarea>
+                    <textarea id="review-text" placeholder="Write your review"></textarea>
+                    <select id="review-rating">
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
                     <button onclick="addReview()">Submit Review</button>
                 </div>
             </div>
@@ -84,15 +102,22 @@
         <h1>Checkout</h1>
         <div class="checkout-form">
             <form id="checkout-form" onsubmit="placeOrder(event)">
-                <input type="text" placeholder="Full Name" required>
-                <input type="text" placeholder="Shipping Address" required>
-                <input type="text" placeholder="Phone Number" required>
-                <input type="email" placeholder="Email Address" required>
+                <input type="text" id="full-name" placeholder="Full Name" required>
+                <input type="text" id="address" placeholder="Shipping Address" required>
+                <input type="tel" id="phone" placeholder="Phone Number" required>
+                <input type="email" id="email" placeholder="Email Address" required>
                 <select id="payment-method" required>
+                    <option value="">Select Payment Method</option>
                     <option value="upi">UPI</option>
-                    <option value="cod">Cash on Delivery</option>
                     <option value="card">Credit/Debit Card</option>
+                    <option value="cod">Cash on Delivery</option>
                 </select>
+                <div id="payment-details" style="display:none;">
+                    <input type="text" id="upi-id" placeholder="UPI ID (e.g., user@upi)">
+                    <input type="text" id="card-number" placeholder="Card Number">
+                    <input type="text" id="card-expiry" placeholder="MM/YY">
+                    <input type="text" id="card-cvv" placeholder="CVV">
+                </div>
                 <button type="submit" class="cta-btn">Place Order</button>
             </form>
             <p id="order-confirmation" style="display:none; color:green;"></p>
@@ -110,8 +135,8 @@
     <section id="login" class="section">
         <div class="login-section">
             <h2>Login or Sign Up</h2>
-            <input type="email" id="login-email" placeholder="Enter your email" required>
-            <input type="password" id="login-password" placeholder="Create a password" required>
+            <input type="email" id="login-email" placeholder="Email Address" required>
+            <input type="password" id="login-password" placeholder="Password" required>
             <button onclick="createAccount()">Sign Up</button>
             <button onclick="loginAccount()">Login</button>
             <p id="login-message" style="color:green;"></p>
@@ -125,12 +150,12 @@
                 <input type="text" id="admin-product-name" placeholder="Product Name" required>
                 <input type="number" id="admin-product-price" placeholder="Price (₹)" required>
                 <input type="text" id="admin-product-desc" placeholder="Description" required>
-                <input type="text" id="admin-product-img" placeholder="Image URL" required>
+                <input type="text" id="admin-product-img" placeholder="Image URL">
                 <select id="admin-product-category" required>
                     <option value="Electronics">Electronics</option>
-                    <option value="Clothes">Fashion</option>
-                    <option value="Handmade">Handmade</option>
-                    <option value="Digital">Digital</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Home">Home & Kitchen</option>
+                    <option value="Books">Books</option>
                 </select>
                 <input type="number" id="admin-product-stock" placeholder="Stock Quantity" required>
                 <button onclick="addProduct()">Add Product</button>
@@ -139,6 +164,8 @@
             <ul id="admin-product-list"></ul>
             <h3>Manage Orders</h3>
             <ul id="admin-order-list"></ul>
+            <h3>Manage Users</h3>
+            <ul id="admin-user-list"></ul>
         </div>
     </section>
 
