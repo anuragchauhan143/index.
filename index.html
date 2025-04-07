@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Amarkart - Ultimate Online Shopping Platform">
-    <meta name="keywords" content="ecommerce, shopping, amazon, flipkart, online store">
+    <meta name="description" content="Amarkart - Ultimate Shopping Experience">
     <title>Amarkart - Shop Everything</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -12,46 +11,40 @@
     <header>
         <h1>Amarkart</h1>
         <div class="search-bar">
-            <input type="text" id="search" placeholder="Search products, brands, and more..." oninput="searchProducts()" autocomplete="off">
+            <input type="text" id="search" placeholder="Search products, brands, or categories..." oninput="searchProducts()" autocomplete="off" aria-label="Search products">
             <div id="search-suggestions" class="suggestions"></div>
-            <button onclick="searchProducts()">🔍</button>
+            <button onclick="searchProducts()" aria-label="Search">🔍</button>
         </div>
         <nav>
+            <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
             <a href="#" onclick="showSection('shop')">Shop</a>
             <a href="#" onclick="showSection('wishlist')">Wishlist (<span id="wishlist-count">0</span>)</a>
             <a href="#" onclick="showSection('cart')">Cart (<span id="cart-count">0</span>)</a>
             <a href="#" onclick="showSection('profile')">Profile</a>
-            <a href="#" onclick="showSection('admin')">Admin</a>
-            <button id="theme-toggle" onclick="toggleTheme()">🌙</button>
+            <a href="#" onclick="showSection('admin-login')">Admin</a>
         </nav>
     </header>
 
     <section id="shop" class="section">
         <h1>Explore Our Products</h1>
         <div class="filters">
-            <select id="sort" onchange="sortProducts()">
+            <select id="sort" onchange="sortProducts()" aria-label="Sort products">
                 <option value="default">Sort by</option>
                 <option value="high-to-low">Price: High to Low</option>
                 <option value="low-to-high">Price: Low to High</option>
                 <option value="rating">Customer Rating</option>
-                <option value="newest">Newest First</option>
             </select>
-            <input type="number" id="min-price" placeholder="Min Price" oninput="filterProducts()">
-            <input type="number" id="max-price" placeholder="Max Price" oninput="filterProducts()">
-            <select id="category" onchange="filterProducts()">
+            <input type="number" id="min-price" placeholder="Min Price" oninput="filterProducts()" aria-label="Minimum price">
+            <input type="number" id="max-price" placeholder="Max Price" oninput="filterProducts()" aria-label="Maximum price">
+            <select id="category" onchange="filterProducts()" aria-label="Filter by category">
                 <option value="all">All Categories</option>
                 <option value="Electronics">Electronics</option>
                 <option value="Fashion">Fashion</option>
                 <option value="Home">Home & Kitchen</option>
                 <option value="Books">Books</option>
             </select>
-            <input type="checkbox" id="in-stock" onchange="filterProducts()"> <label for="in-stock">In Stock Only</label>
         </div>
         <div class="product-grid" id="shop-products"></div>
-        <div id="recommendations" class="recommendations">
-            <h3>Recommended for You</h3>
-            <div id="recommended-products" class="product-grid"></div>
-        </div>
     </section>
 
     <section id="product" class="section">
@@ -63,23 +56,9 @@
                 <div class="rating" id="product-rating"></div>
                 <p id="product-desc"></p>
                 <p><strong>Availability:</strong> <span id="product-stock"></span></p>
-                <p><strong>Delivery:</strong> <span id="product-delivery">Free Delivery by Apr 10, 2025</span></p>
-                <input type="number" id="product-quantity" min="1" value="1">
+                <input type="number" id="product-quantity" min="1" value="1" aria-label="Quantity">
                 <button class="add-to-cart" id="product-add-btn">Add to Cart</button>
                 <button class="wishlist-btn" id="product-wishlist-btn">Add to Wishlist</button>
-                <div class="reviews">
-                    <h3>Customer Reviews</h3>
-                    <ul id="product-reviews"></ul>
-                    <textarea id="review-text" placeholder="Write your review"></textarea>
-                    <select id="review-rating">
-                        <option value="5">5 Stars</option>
-                        <option value="4">4 Stars</option>
-                        <option value="3">3 Stars</option>
-                        <option value="2">2 Stars</option>
-                        <option value="1">1 Star</option>
-                    </select>
-                    <button onclick="addReview()">Submit Review</button>
-                </div>
             </div>
         </div>
     </section>
@@ -102,22 +81,14 @@
         <h1>Checkout</h1>
         <div class="checkout-form">
             <form id="checkout-form" onsubmit="placeOrder(event)">
-                <input type="text" id="full-name" placeholder="Full Name" required>
-                <input type="text" id="address" placeholder="Shipping Address" required>
-                <input type="tel" id="phone" placeholder="Phone Number" required>
-                <input type="email" id="email" placeholder="Email Address" required>
-                <select id="payment-method" required>
-                    <option value="">Select Payment Method</option>
+                <input type="text" id="full-name" placeholder="Full Name" required aria-label="Full name">
+                <input type="text" id="address" placeholder="Shipping Address" required aria-label="Shipping address">
+                <input type="tel" id="phone" placeholder="Phone Number" required aria-label="Phone number">
+                <input type="email" id="email" placeholder="Email Address" required aria-label="Email address">
+                <select id="payment-method" required aria-label="Payment method">
                     <option value="upi">UPI</option>
-                    <option value="card">Credit/Debit Card</option>
                     <option value="cod">Cash on Delivery</option>
                 </select>
-                <div id="payment-details" style="display:none;">
-                    <input type="text" id="upi-id" placeholder="UPI ID (e.g., user@upi)">
-                    <input type="text" id="card-number" placeholder="Card Number">
-                    <input type="text" id="card-expiry" placeholder="MM/YY">
-                    <input type="text" id="card-cvv" placeholder="CVV">
-                </div>
                 <button type="submit" class="cta-btn">Place Order</button>
             </form>
             <p id="order-confirmation" style="display:none; color:green;"></p>
@@ -135,42 +106,53 @@
     <section id="login" class="section">
         <div class="login-section">
             <h2>Login or Sign Up</h2>
-            <input type="email" id="login-email" placeholder="Email Address" required>
-            <input type="password" id="login-password" placeholder="Password" required>
+            <input type="email" id="login-email" placeholder="Email Address" required aria-label="Email">
+            <input type="password" id="login-password" placeholder="Password" required aria-label="Password">
             <button onclick="createAccount()">Sign Up</button>
             <button onclick="loginAccount()">Login</button>
             <p id="login-message" style="color:green;"></p>
         </div>
     </section>
 
+    <section id="admin-login" class="section" style="display:none;">
+        <div class="admin-login-section">
+            <h2>Admin Login</h2>
+            <input type="email" id="admin-email" placeholder="Admin Email" required aria-label="Admin email">
+            <input type="password" id="admin-password" placeholder="Admin Password" required aria-label="Admin password">
+            <button onclick="loginAdmin()">Login</button>
+            <p id="admin-login-message" style="color:red;"></p>
+        </div>
+    </section>
+
     <section id="admin" class="section" style="display:none;">
         <div class="admin-panel">
             <h1>Admin Panel</h1>
+            <button onclick="logoutAdmin()" class="cta-btn" style="background:#e05555;">Logout Admin</button>
             <div class="product-form">
-                <input type="text" id="admin-product-name" placeholder="Product Name" required>
-                <input type="number" id="admin-product-price" placeholder="Price (₹)" required>
-                <input type="text" id="admin-product-desc" placeholder="Description" required>
-                <input type="text" id="admin-product-img" placeholder="Image URL">
-                <select id="admin-product-category" required>
+                <h2>Add New Product</h2>
+                <input type="text" id="admin-product-name" placeholder="Product Name" required aria-label="Product name">
+                <input type="number" id="admin-product-price" placeholder="Price (₹)" required aria-label="Price">
+                <textarea id="admin-product-desc" placeholder="Description" required aria-label="Description"></textarea>
+                <input type="text" id="admin-product-img" placeholder="Image URL (optional)" aria-label="Image URL">
+                <select id="admin-product-category" required aria-label="Category">
                     <option value="Electronics">Electronics</option>
                     <option value="Fashion">Fashion</option>
                     <option value="Home">Home & Kitchen</option>
                     <option value="Books">Books</option>
                 </select>
-                <input type="number" id="admin-product-stock" placeholder="Stock Quantity" required>
-                <button onclick="addProduct()">Add Product</button>
+                <input type="number" id="admin-product-stock" placeholder="Stock Quantity" required aria-label="Stock quantity">
+                <button onclick="addProduct()" class="cta-btn">Add Product</button>
             </div>
-            <h3>Manage Products</h3>
+            <h2>Manage Products</h2>
+            <div class="admin-search">
+                <input type="text" id="admin-search" placeholder="Search products..." oninput="searchAdminProducts()" aria-label="Search admin products">
+            </div>
             <ul id="admin-product-list"></ul>
-            <h3>Manage Orders</h3>
-            <ul id="admin-order-list"></ul>
-            <h3>Manage Users</h3>
-            <ul id="admin-user-list"></ul>
         </div>
     </section>
 
     <footer>
-        <p>© 2025 Amarkart. All Rights Reserved. | <a href="#terms">Terms</a> | <a href="#privacy">Privacy</a> | <a href="mailto:support@amarkart.com">Support</a></p>
+        <p>© 2025 Amarkart. All Rights Reserved.</p>
     </footer>
 
     <script src="script.js"></script>
