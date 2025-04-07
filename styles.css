@@ -20,12 +20,12 @@ nav a, nav button { color: white; margin: 0 15px; text-decoration: none; backgro
 .cta-btn, .add-to-cart, .wishlist-btn { background: #fb641b; color: white; border: none; padding: 12px 24px; cursor: pointer; border-radius: 4px; margin: 5px; transition: background 0.3s; }
 .cta-btn:hover, .add-to-cart:hover, .wishlist-btn:hover { background: #e05555; }
 .admin-panel, .admin-login-section { max-width: 800px; margin: 0 auto; text-align: center; }
-.product-form { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-.product-form input, .product-form textarea, .product-form select { display: block; width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+.product-form, .password-change { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+.product-form input, .product-form textarea, .product-form select, .password-change input { display: block; width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
 .product-form textarea { height: 100px; }
 .admin-search input { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 4px; }
 #admin-product-list li { padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
 #admin-product-list button { background: #e05555; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 5px; }
 footer { text-align: center; padding: 15px; background: #f4f4f4; }
-body.dark .product-card, body.dark .suggestions, body.dark .product-form, body.dark footer { background: #333; color: #fff; border-color: #555; }
+body.dark .product-card, body.dark .suggestions, body.dark .product-form, body.dark .password-change, body.dark footer { background: #333; color: #fff; border-color: #555; }
 @media (max-width: 600px) { .product-grid { grid-template-columns: 1fr; } .search-bar input, .suggestions { width: 100%; } }
