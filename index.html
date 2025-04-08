@@ -3,163 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Amarkart - Ultimate Shopping Experience">
-    <title>Amarkart - Shop Everything</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Anurakart - Online Shopping</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/header.css">
+    <link rel="stylesheet" href="styles/product.css">
+    <link rel="stylesheet" href="styles/auth.css">
+    <link rel="stylesheet" href="styles/checkout.css">
+    <link rel="stylesheet" href="styles/responsive.css">
 </head>
 <body>
-    <header>
-        <h1>Amarkart</h1>
-        <div class="search-bar">
-            <input type="text" id="search" placeholder="Search products, brands, or categories..." oninput="searchProducts()" autocomplete="off" aria-label="Search products">
-            <div id="search-suggestions" class="suggestions"></div>
-            <button onclick="searchProducts()" aria-label="Search">🔍</button>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="Anurakart" class="brand-logo">
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search for products, brands and more">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <!-- User Actions -->
+            <div class="user-actions">
+                <div class="action-item" id="user-menu">
+                    <i class="far fa-user"></i>
+                    <span>Login</span>
+                </div>
+                <div class="action-item" id="wishlist">
+                    <i class="far fa-heart"></i>
+                    <span>Wishlist</span>
+                </div>
+                <div class="action-item" id="cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Cart</span>
+                    <div class="cart-count">0</div>
+                </div>
+            </div>
         </div>
-        <nav>
-            <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
-            <a href="#" onclick="showSection('shop')">Shop</a>
-            <a href="#" onclick="showSection('wishlist')">Wishlist (<span id="wishlist-count">0</span>)</a>
-            <a href="#" onclick="showSection('cart')">Cart (<span id="cart-count">0</span>)</a>
-            <a href="#" onclick="showSection('profile')">Profile</a>
-            <a href="#" onclick="showSection('admin-login')">Admin</a>
+
+        <!-- Navigation Categories -->
+        <nav class="category-nav">
+            <div class="nav-container">
+                <a href="#electronics" class="nav-item">Electronics</a>
+                <a href="#fashion" class="nav-item">Fashion</a>
+                <a href="#home" class="nav-item">Home & Kitchen</a>
+                <a href="#appliances" class="nav-item">Appliances</a>
+                <a href="#toys" class="nav-item">Toys & Baby</a>
+            </div>
         </nav>
     </header>
 
-    <section id="shop" class="section">
-        <h1>Explore Our Products</h1>
-        <div class="filters">
-            <select id="sort" onchange="sortProducts()" aria-label="Sort products">
-                <option value="default">Sort by</option>
-                <option value="high-to-low">Price: High to Low</option>
-                <option value="low-to-high">Price: Low to High</option>
-                <option value="rating">Customer Rating</option>
-            </select>
-            <input type="number" id="min-price" placeholder="Min Price" oninput="filterProducts()" aria-label="Minimum price">
-            <input type="number" id="max-price" placeholder="Max Price" oninput="filterProducts()" aria-label="Maximum price">
-            <select id="category" onchange="filterProducts()" aria-label="Filter by category">
-                <option value="all">All Categories</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Fashion">Fashion</option>
-                <option value="Home">Home & Kitchen</option>
-                <option value="Books">Books</option>
-            </select>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Product Grid Section -->
+        <section class="product-grid">
+            <!-- Products loaded dynamically -->
+        </section>
+
+        <!-- Product Detail Modal -->
+        <div class="product-detail-modal">
+            <!-- Dynamic content -->
         </div>
-        <div class="product-grid" id="shop-products"></div>
-    </section>
 
-    <section id="product" class="section">
-        <div class="product-details">
-            <img id="product-img" src="" alt="Product Image" loading="lazy">
-            <div class="info">
-                <h1 id="product-name"></h1>
-                <p class="price" id="product-price"></p>
-                <div class="rating" id="product-rating"></div>
-                <p id="product-desc"></p>
-                <p><strong>Availability:</strong> <span id="product-stock"></span></p>
-                <input type="number" id="product-quantity" min="1" value="1" aria-label="Quantity">
-                <button class="add-to-cart" id="product-add-btn">Add to Cart</button>
-                <button class="wishlist-btn" id="product-wishlist-btn">Add to Wishlist</button>
-            </div>
+        <!-- Checkout Section -->
+        <div class="checkout-wrapper">
+            <!-- Dynamic content -->
         </div>
-    </section>
+    </main>
 
-    <section id="cart" class="section">
-        <h1>Your Shopping Cart</h1>
-        <div class="cart-items">
-            <ul id="cart-items"></ul>
-            <p><strong>Total:</strong> ₹<span id="cart-total">0</span></p>
-            <button class="cta-btn" onclick="showSection('checkout')">Proceed to Checkout</button>
+    <!-- Auth Modals -->
+    <div class="auth-modal-container">
+        <!-- Login/Signup forms -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <!-- Footer sections -->
         </div>
-    </section>
-
-    <section id="wishlist" class="section">
-        <h1>Your Wishlist</h1>
-        <ul id="wishlist-items"></ul>
-    </section>
-
-    <section id="checkout" class="section">
-        <h1>Checkout</h1>
-        <div class="checkout-form">
-            <form id="checkout-form" onsubmit="placeOrder(event)">
-                <input type="text" id="full-name" placeholder="Full Name" required aria-label="Full name">
-                <input type="text" id="address" placeholder="Shipping Address" required aria-label="Shipping address">
-                <input type="tel" id="phone" placeholder="Phone Number" required aria-label="Phone number">
-                <input type="email" id="email" placeholder="Email Address" required aria-label="Email address">
-                <select id="payment-method" required aria-label="Payment method">
-                    <option value="upi">UPI</option>
-                    <option value="cod">Cash on Delivery</option>
-                </select>
-                <button type="submit" class="cta-btn">Place Order</button>
-            </form>
-            <p id="order-confirmation" style="display:none; color:green;"></p>
-        </div>
-    </section>
-
-    <section id="profile" class="section">
-        <h1>Your Profile</h1>
-        <div id="profile-info"></div>
-        <h3>Your Orders</h3>
-        <ul id="order-history"></ul>
-        <button onclick="logout()">Logout</button>
-    </section>
-
-    <section id="login" class="section">
-        <div class="login-section">
-            <h2>Login or Sign Up</h2>
-            <input type="email" id="login-email" placeholder="Email Address" required aria-label="Email">
-            <input type="password" id="login-password" placeholder="Password" required aria-label="Password">
-            <button onclick="createAccount()">Sign Up</button>
-            <button onclick="loginAccount()">Login</button>
-            <p id="login-message" style="color:green;"></p>
-        </div>
-    </section>
-
-    <section id="admin-login" class="section" style="display:none;">
-        <div class="admin-login-section">
-            <h2>Admin Login</h2>
-            <input type="password" id="admin-password" placeholder="Admin Password" required aria-label="Admin password">
-            <button onclick="loginAdmin()">Login</button>
-            <p id="admin-login-message" style="color:red;"></p>
-        </div>
-    </section>
-
-    <section id="admin" class="section" style="display:none;">
-        <div class="admin-panel">
-            <h1>Admin Panel</h1>
-            <button onclick="logoutAdmin()" class="cta-btn" style="background:#e05555;">Logout Admin</button>
-            <div class="product-form">
-                <h2>Add New Product</h2>
-                <input type="text" id="admin-product-name" placeholder="Product Name" required aria-label="Product name">
-                <input type="number" id="admin-product-price" placeholder="Price (₹)" required aria-label="Price">
-                <textarea id="admin-product-desc" placeholder="Description" required aria-label="Description"></textarea>
-                <input type="text" id="admin-product-img" placeholder="Image URL (optional)" aria-label="Image URL">
-                <select id="admin-product-category" required aria-label="Category">
-                    <option value="Electronics">Electronics</option>
-                    <option value="Fashion">Fashion</option>
-                    <option value="Home">Home & Kitchen</option>
-                    <option value="Books">Books</option>
-                </select>
-                <input type="number" id="admin-product-stock" placeholder="Stock Quantity" required aria-label="Stock quantity">
-                <button onclick="addProduct()" class="cta-btn">Add Product</button>
-            </div>
-            <h2>Manage Products</h2>
-            <div class="admin-search">
-                <input type="text" id="admin-search" placeholder="Search products..." oninput="searchAdminProducts()" aria-label="Search admin products">
-            </div>
-            <ul id="admin-product-list"></ul>
-            <h2>Change Admin Password</h2>
-            <div class="password-change">
-                <input type="password" id="new-admin-password" placeholder="New Admin Password" required aria-label="New admin password">
-                <button onclick="changeAdminPassword()" class="cta-btn">Change Password</button>
-            </div>
-            <p id="password-change-message" style="color:green;"></p>
-        </div>
-    </section>
-
-    <footer>
-        <p>© 2025 Amarkart. All Rights Reserved.</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="firebase.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/products.js"></script>
+    <script src="scripts/cart.js"></script>
+    <script src="scripts/checkout.js"></script>
 </body>
 </html>
