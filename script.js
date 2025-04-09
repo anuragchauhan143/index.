@@ -1,145 +1,140 @@
-import { db } from '../firebase.js';
-import { showToast } from './main.js';
+// Initialize Firebase
+var config = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(config);
 
-// Product Manager Class
-class ProductManager {
-    constructor() {
-        this.products = [];
-        this.filters = {
-            category: 'all',
-            sortBy: 'price_low_to_high',
-            priceRange: [0, 100000],
-            ratings: 0
-        };
-    }
+// Get elements
+var header = document.querySelector("header");
+var main = document.querySelector("main");
+var footer = document.querySelector("footer");
+var searchInput = document.querySelector(".search-bar input[type='search']");
+var searchButton = document.querySelector(".search-bar button");
+var productGrid = document.querySelector(".product-grid");
+var cartPage = document.querySelector(".cart-page");
+var wishlistPage = document.querySelector(".wishlist-page");
+var checkoutFlow = document.querySelector(".checkout-flow");
 
-    async loadProducts() {
-        try {
-            const snapshot = await db.collection('products').get();
-            this.products = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            this.renderProducts();
-        } catch (error) {
-            showToast('Failed to load products', 'error');
-        }
-    }
+// Add event listeners
+searchButton.addEventListener("click", searchProducts);
+productGrid.addEventListener("click", viewProductDetail);
+cartPage.addEventListener("click", viewCart);
+wishlistPage.addEventListener("click", viewWishlist);
+checkoutFlow.addEventListener("click", checkout);
 
-    renderProducts() {
-        const grid = document.querySelector('.product-grid');
-        grid.innerHTML = '';
-
-        this.products
-            .filter(product => this.applyFilters(product))
-            .sort(this.sortProducts())
-            .forEach(product => {
-                const card = this.createProductCard(product);
-                grid.appendChild(card);
-            });
-    }
-
-    createProductCard(product) {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-            <div class="product-image">
-                ${product.discount > 0 ? 
-                    `<div class="product-badge">${product.discount}% OFF</div>` : ''}
+// Functions
+function searchProducts() {
+    var searchQuery = searchInput.value;
+    // Use Firebase Firestore to search for products
+    firebase.firestore().collection("products").where("name", "==", searchQuery).get().then(function(querySnapshot) {
+        var products = querySnapshot.docs.map(function(doc) {
+            return doc.data();
+        });
+        // Display search results
+        productGrid.innerHTML = "";
+        products.forEach(function(product) {
+            var productCard = document.createElement("div");
+            productCard.classList.add("product-card");
+            productCard.innerHTML = `
                 <img src="${product.image}" alt="${product.name}">
-            </div>
-            <div class="product-details">
-                <h3 class="product-title">${product.name}</h3>
-                <div class="product-rating">
-                    ${this.generateRatingStars(product.rating)}
-                </div>
-                <div class="product-pricing">
-                    <span class="product-price">₹${product.price.toLocaleString()}</span>
-                    ${product.originalPrice ? 
-                        `<span class="product-original-price">₹${product.originalPrice.toLocaleString()}</span>` : ''}
-                    ${product.discount ? 
-                        `<span class="product-discount">${product.discount}% off</span>` : ''}
-                </div>
-                <div class="product-actions">
-                    <button class="add-to-cart-btn" data-id="${product.id}">
-                        Add to Cart
-                    </button>
-                    <button class="buy-now-btn" data-id="${product.id}">
-                        Buy Now
-                    </button>
-                </div>
-            </div>
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <p>Price: ${product.price}</p>
+            `;
+            productGrid.appendChild(productCard);
+        });
+    });
+}
+
+function viewProductDetail(event) {
+    var productCard = event.target.closest(".product-card");
+    var productId = productCard.dataset.productId;
+    // Use Firebase Firestore to get product details
+    firebase.firestore().collection("products").doc(productId).get().then(function(doc) {
+        var product = doc.data();
+        // Display product details
+        var productDetail = document.createElement("div");
+        productDetail.classList.add("product-detail");
+        productDetail.innerHTML = `
+            <h2>${product.name}</h2>
+            <img src="${product.image}" alt="${product.name}">
+            <p>${product.description}</p>
+            <p>Price: ${product.price}</p>
         `;
+        main.appendChild(productDetail);
+    });
+}
 
-        return card;
-    }
+function viewCart() {
+    // Use Firebase Firestore to get cart items
+    firebase.firestore().collection("cart").get().then(function(querySnapshot) {
+        var cartItems = querySnapshot.docs.map(function(doc) {
+            return doc.data();
+        });
+        // Display cart items
+        cartPage.innerHTML = "";
+        cartItems.forEach(function(cartItem) {
+            var cartItemCard = document.createElement("div");
+            cartItemCard.classList.add("cart-item");
+            cartItemCard.innerHTML = `
+                <img src="${cartItem.image}" alt="${cartItem.name}">
+                <h3>${cartItem.name}</h3>
+                <p>Price: ${cartItem.price}</p>
+            `;
+            cartPage.appendChild(cartItemCard);
+        });
+    });
+}
 
-    generateRatingStars(rating) {
-        const fullStars = Math.floor(rating);
-        const halfStar = rating % 1 >= 0.5 ? 1 : 0;
-        const emptyStars = 5 - fullStars - halfStar;
-        
-        return `
-            ${'<i class="fas fa-star"></i>'.repeat(fullStars)}
-            ${halfStar ? '<i class="fas fa-star-half-alt"></i>' : ''}
-            ${'<i class="far fa-star"></i>'.repeat(emptyStars)}
-            <span class="rating-count">(${Math.floor(Math.random() * 1000)})</span>
+function viewWishlist() {
+    // Use Firebase Firestore to get wishlist items
+    firebase.firestore().collection("wishlist").get().then(function(querySnapshot) {
+        var wishlistItems = querySnapshot.docs.map(function(doc) {
+            return doc.data();
+        });
+        // Display wishlist items
+        wishlistPage.innerHTML = "";
+        wishlistItems.forEach(function(wishlistItem) {
+            var wishlistItemCard = document.createElement("div");
+            wishlistItemCard.classList.add("wishlist-item");
+            wishlistItemCard.innerHTML = `
+                <img src="${wishlistItem.image}" alt="${wishlistItem.name}">
+                <h3>${wishlistItem.name}</h3>
+                <p>Price: ${wishlistItem.price}</p>
+            `;
+            wishlistPage.appendChild(wishlistItemCard);
+        });
+    });
+}
+
+function checkout() {
+    // Use Firebase Firestore to get order details
+    firebase.firestore().collection("orders").get().then(function(querySnapshot) {
+        var orders = querySnapshot.docs.map(function(doc) {
+            return doc.data();
+        });
+        // Display order summary
+        var orderSummary = document.createElement("div");
+        orderSummary.classList.add("order-summary");
+        orderSummary.innerHTML = `
+            <h2>Order Summary</h2>
+            <ul>
+                ${orders.map(function(order) {
+                    return `
+                        <li>
+                            <h3>${order.name}</h3>
+                            <p>Price: ${order.price}</p>
+                        </li>
+                    `;
+                }).join("")}
+            </ul>
         `;
-    }
-}
-
-// Initialize Product System
-export function initProducts() {
-    const productManager = new ProductManager();
-    productManager.loadProducts();
-}
-export class CartManager {
-    constructor() {
-        this.cart = JSON.parse(localStorage.getItem('cart')) || [];
-        this.cartCount = document.querySelector('.cart-count');
-    }
-
-    addToCart(product, quantity = 1) {
-        const existingItem = this.cart.find(item => item.id === product.id);
-        
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            this.cart.push({
-                ...product,
-                quantity,
-                addedAt: new Date().toISOString()
-            });
-        }
-
-        this.updateCart();
-    }
-
-    removeFromCart(productId) {
-        this.cart = this.cart.filter(item => item.id !== productId);
-        this.updateCart();
-    }
-
-    updateQuantity(productId, newQuantity) {
-        const item = this.cart.find(item => item.id === productId);
-        if (item) {
-            item.quantity = newQuantity;
-            this.updateCart();
-        }
-    }
-
-    updateCart() {
-        localStorage.setItem('cart', JSON.stringify(this.cart));
-        this.updateCartCount();
-        this.updateCartPreview();
-    }
-
-    updateCartCount() {
-        this.cartCount.textContent = this.cart.reduce((total, item) => total + item.quantity, 0);
-    }
-
-    getCartTotal() {
-        return this.cart.reduce((total, item) => 
-            total + (item.price * item.quantity), 0);
-    }
-}
+        main.appendChild(orderSummary);
+    });
+                                }
